@@ -26,6 +26,17 @@ jobs:
         
     - name: Setup Gradle
       uses: gradle/gradle-build-action@v2
+      
+    - name: Create build configuration
+      run: |
+        echo kotlin.code.style=official > gradle.properties
+        echo jarOutput=item-chest-sorter.jar >> gradle.properties
     
     - name: Execute Gradle build
       run: gradle build
+      
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: item-chest-sorter
+        path: item-chest-sorter.jar
