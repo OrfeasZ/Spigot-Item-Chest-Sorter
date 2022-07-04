@@ -148,10 +148,10 @@ class Listener(private val db: JsonHelper, private val main: ItemChestSorter) : 
      */
     private fun checkInventory(inventory: Inventory, player: HumanEntity? = null, itemStack: ItemStack? = null) {
         // get the sender by the inventory location
-        val isSulkerBox = inventory.type !== InventoryType.SHULKER_BOX
-        val sulkerBoxesAllowed = main.config.getBoolean("allowShulkerBoxes", false)
+        val isShulkerBox = inventory.type == InventoryType.SHULKER_BOX
+        val shulkerBoxesAllowed = main.config.getBoolean("allowShulkerBoxes", false)
 
-        if (isSulkerBox && !sulkerBoxesAllowed) {
+        if (isShulkerBox && !shulkerBoxesAllowed) {
             player?.sendMessage("${ChatColor.YELLOW}Shulker Boxes are not allowed on this server")
             return
         }
