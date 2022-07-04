@@ -147,7 +147,11 @@ class Listener(private val db: JsonHelper, private val main: ItemChestSorter) : 
      * @author Flo Dörr
      */
     private fun checkInventory(inventory: Inventory, player: HumanEntity? = null, itemStack: ItemStack? = null) {
-        // get the sender by the inventory location
+        val location = inventory.location ?: return
+
+        // Only move items if this is a sender chest.
+        val sender = db.getSenderByCords(locationToCords(location)) ?: return
+
         val isShulkerBox = inventory.type == InventoryType.SHULKER_BOX
         val shulkerBoxesAllowed = main.config.getBoolean("allowShulkerBoxes", false)
 
