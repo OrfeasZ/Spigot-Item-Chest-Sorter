@@ -59,7 +59,6 @@ class Commands(private val db: JsonHelper, private val ics: ItemChestSorter): Co
                             val permission = "ics.remove.sender"
                             if (sender.hasPermission(permission)) {
                                 if (db.removeSender(args[2])) {
-                                    currentSender[(sender as Player).uniqueId.toString()] = null
                                     sender.sendMessage("${ChatColor.GREEN}Successfully deleted the sender chest.")
                                 } else {
                                     sender.sendMessage("${ChatColor.RED}Error while deleting the sender chest with id ${args[2]}. This most likely means the id was not found.")

@@ -33,25 +33,14 @@ class JsonHelper(dataFolder: File, commandSender: ConsoleCommandSender? = null, 
      */
     fun addSender(sender: Sender): Boolean {
         val json = getJSON()
-        for (jsonSender in json.sender) {
-            if(jsonSender.sid == sender.sid){
+        for (jsonSender in json.senders) {
+            if(jsonSender.id == sender.id){
                 return false
             }
         }
-        json.sender.add(sender)
+        json.senders.add(sender)
         saveJSONIfNecessary(json)
         return true
-    }
-
-    /**
-     * removes a sender by a sender object
-     * @param sender sender to be removed
-     * @return true if removed successfully
-     *
-     * @author Flo Dörr
-     */
-    fun removeSender(sender: Sender): Boolean {
-        return removeSender(sender.sid)
     }
 
     /**
@@ -63,9 +52,9 @@ class JsonHelper(dataFolder: File, commandSender: ConsoleCommandSender? = null, 
      */
     fun removeSender(sid: String): Boolean {
         val json = getJSON()
-        for (sender in json.sender){
-            if(sid == sender.sid) {
-                json.sender.remove(sender)
+        for (sender in json.senders){
+            if(sid == sender.id) {
+                json.senders.remove(sender)
                 saveJSONIfNecessary(json)
                 return true
             }
@@ -82,8 +71,8 @@ class JsonHelper(dataFolder: File, commandSender: ConsoleCommandSender? = null, 
      */
     fun getSenderById(sid: String): Sender? {
         val json = getJSON()
-        for (sender in json.sender) {
-            if(sender.sid == sid) {
+        for (sender in json.senders) {
+            if(sender.id == sid) {
                 return sender
             }
         }
@@ -99,9 +88,26 @@ class JsonHelper(dataFolder: File, commandSender: ConsoleCommandSender? = null, 
      */
     fun getSenderByCords(cords: Cords): Sender? {
         val json = getJSON()
-        for (sender in json.sender) {
+        for (sender in json.senders) {
             if(sender.cords.left == cords || sender.cords.right == cords) {
                 return sender
+            }
+        }
+        return null
+    }
+
+    /**
+     * return a receiver object by a receiver's cords
+     * @param cords coordinates of the receiver chest
+     * @return Receiver object if found, else null
+     *
+     * @author Flo Dörr
+     */
+    fun getReceiverByCords(cords: Cords): Receiver? {
+        val json = getJSON()
+        for (receiver in json.receivers) {
+            if(receiver.cords.left == cords || receiver.cords.right == cords) {
+                return receiver
             }
         }
         return null
@@ -116,16 +122,19 @@ class JsonHelper(dataFolder: File, commandSender: ConsoleCommandSender? = null, 
      */
     fun chestExists(cords: Cords): Boolean {
         val json = getJSON()
-        for (sender in json.sender) {
-            for (receiver in sender.receiver) {
-                if(receiver.cords.left == cords || receiver.cords.right == cords) {
-                    return true
-                }
-            }
+
+        for (sender in json.senders) {
             if(sender.cords.left == cords || sender.cords.right == cords) {
                 return true
             }
         }
+
+        for (receiver in json.receivers) {
+            if(receiver.cords.left == cords || receiver.cords.right == cords) {
+                return true
+            }
+        }
+
         return false
     }
 
@@ -136,19 +145,7 @@ class JsonHelper(dataFolder: File, commandSender: ConsoleCommandSender? = null, 
      * @author Flo Dörr
      */
     fun getSender(): ArrayList<Sender> {
-        return getJSON().sender
-    }
-
-    /**
-     * adds a receiver to a sender
-     * @param receiver to be added
-     * @param sender to which the receiver should be added to
-     * @return true if added successfully
-     *
-     * @author Flo Dörr
-     */
-    fun addReceiverToSender(receiver: Receiver, sender: Sender): Boolean {
-        return addReceiverToSender(receiver, sender.sid)
+        return getJSON().senders
     }
 
     /**
@@ -159,32 +156,16 @@ class JsonHelper(dataFolder: File, commandSender: ConsoleCommandSender? = null, 
      *
      * @author Flo Dörr
      */
-    fun addReceiverToSender(receiver: Receiver, sid: String): Boolean {
+    fun addReceiver(receiver: Receiver): Boolean {
         val json = getJSON()
-        for (jsonSender in json.sender) {
-            if(jsonSender.sid == sid) {
-                for (jsonReceiver in jsonSender.receiver) {
-                    if(jsonReceiver.rid == receiver.rid) {
-                        return false
-                    }
-                }
-                jsonSender.receiver.add(receiver)
-                saveJSONIfNecessary(json)
-                return true
+        for (jsonReceiver in json.receivers) {
+            if(jsonReceiver.id == receiver.id){
+                return false
             }
         }
-        return false
-    }
-
-    /**
-     * removes a receiver by a receiver object
-     * @param receiver receiver to be removed
-     * @return true if removed successfully
-     *
-     * @author Flo Dörr
-     */
-    fun removeReceiver(receiver: Receiver): Boolean {
-        return removeReceiver(receiver.rid)
+        json.receivers.add(receiver)
+        saveJSONIfNecessary(json)
+        return true
     }
 
     /**
@@ -196,27 +177,14 @@ class JsonHelper(dataFolder: File, commandSender: ConsoleCommandSender? = null, 
      */
     fun removeReceiver(rid: String): Boolean {
         val json = getJSON()
-        for (sender in json.sender) {
-            for (receiver in sender.receiver) {
-                if(receiver.rid == rid) {
-                    sender.receiver.remove(receiver)
-                    saveJSONIfNecessary(json)
-                    return true
-                }
+        for (receiver in json.receivers){
+            if(rid == receiver.id) {
+                json.receivers.remove(receiver)
+                saveJSONIfNecessary(json)
+                return true
             }
         }
         return false
-    }
-
-    /**
-     * return all receiver of a sender object
-     * @param sender sender whose receiver should be returned
-     * @return List of receiver
-     *
-     * @author Flo Dörr
-     */
-    fun getReceiverFromSender(sender: Sender): ArrayList<Receiver>? {
-        return getReceiverFromSender(sender.sid)
     }
 
     /**
@@ -226,9 +194,8 @@ class JsonHelper(dataFolder: File, commandSender: ConsoleCommandSender? = null, 
      *
      * @author Flo Dörr
      */
-    fun getReceiverFromSender(sid: String): ArrayList<Receiver>? {
-        val sender = getSenderById(sid) ?: return null
-        return sender.receiver
+    fun getReceivers(): ArrayList<Receiver> {
+        return getJSON().receivers
     }
 
     /**
@@ -240,20 +207,21 @@ class JsonHelper(dataFolder: File, commandSender: ConsoleCommandSender? = null, 
      */
     fun getSavedChestFromCords(cords: Cords): Pair<Sender?, Receiver?>? {
         val json = getJSON()
-        val receivers = ArrayList<Receiver>()
+
         // first go through sender because it could be potentially faster
-        for (sender in json.sender) {
+        for (sender in json.senders) {
             if (sender.cords.left == cords || sender.cords.right == cords) {
                 return Pair(sender, null)
             }
-            receivers.addAll(sender.receiver)
         }
+
         // if not in sender go through receiver
-        for (receiver in receivers) {
+        for (receiver in json.receivers) {
             if (receiver.cords.left == cords || receiver.cords.right == cords) {
                 return Pair(null, receiver)
             }
         }
+
         return null
     }
 
@@ -317,42 +285,5 @@ class JsonHelper(dataFolder: File, commandSender: ConsoleCommandSender? = null, 
             return false
         }
         return saveJSON(cachedJSON!!)
-    }
-
-    /**
-     * migrate json by setting the world param if this plugin was used before 1.6.0
-     * @param defaultWorld UUID of the default world
-     *
-     * @author Flo Dörr
-     */
-    fun migrateMissingWorldNamesJSON(defaultWorld: String) {
-        val json: JSON = getJSON()
-        for (sender in json.sender){
-            if(sender.cords.left.world == null){
-                sender.cords.left.world = defaultWorld
-                sender.cords.right?.world = defaultWorld
-            }
-            for(receiver in sender.receiver) {
-                if(receiver.cords.left.world == null){
-                    receiver.cords.left.world = defaultWorld
-                    receiver.cords.right?.world = defaultWorld
-                }
-            }
-        }
-        saveJSON(json)
-    }
-
-    /**
-     * gets the count of registered chest by a players uuid. Counts senders and receivers.
-     * @return count of registered chests
-     *
-     * @author Flo Dörr
-     */
-    fun getChestCountByPlayer(playerUUID: String): Int {
-        return getJSON().sender
-            .filter { sender -> sender.playerID == playerUUID }
-            .sumOf { sender -> 1 + sender.receiver
-                .count { receiver -> receiver.playerID == playerUUID }
-            }
     }
 }

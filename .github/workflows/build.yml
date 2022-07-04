@@ -30,7 +30,7 @@ jobs:
     - name: Create build configuration
       run: |
         echo kotlin.code.style=official > gradle.properties
-        echo jarOutput=item-chest-sorter.jar >> gradle.properties
+        echo jarOutput=dist >> gradle.properties
     
     - name: Execute Gradle build
       run: gradle build
@@ -39,4 +39,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: item-chest-sorter
-        path: item-chest-sorter.jar
+        path: dist
